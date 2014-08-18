@@ -53,11 +53,18 @@ test_that("SPData subsets correctly", {
   single.channel <- sample(1:nChannel(sp),1)
   sp.cell <- sp[single.cell,]
   sp.channel <- sp[,single.channel]
+  
+  expect_equal(nCells(sp.cell), 1)
+  expect_equal(nChannel(sp.channel), 1)
+  
+  expect_equal(cells(sp.cell), cells(sp)[single.cell,,drop=FALSE])
+  expect_equal(cells(sp.channel), cells(sp)[,single.channel,drop=FALSE])
 })
 
 test_that("SPData cell class handling", {
     expect_equal(cell.classes, cellClass(sp))   
     ## neighbourClass 
+      
     
 })
 

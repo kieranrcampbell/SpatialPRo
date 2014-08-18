@@ -325,6 +325,7 @@ setReplaceMethod("cellClass", signature="SPData",
 #' @aliases neighbourClass,SPData-methods
 setMethod("neighbourClass", signature("SPData","numeric"),
           function(object, cell.class) {
+              if(!(cell.class %in% cellClass(object))) stop("Cell class not present in tissue")
               X <- neighbours(sp)
               nn.ids <- neighbourIDs(sp)
               cell.select <- which(cellClass(sp) == cell.class)
