@@ -255,4 +255,5 @@ ConstructSampleFactors <- function(XY, sample.ids) {
 #' @name SPE_report
 #' @usage data(SPE_report)
 #' @format An SPExp object with 5 samples
+#' @export
 NULL

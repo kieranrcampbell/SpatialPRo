@@ -15,4 +15,8 @@ Imports:
     EMCluster,
     glmnet
 LazyData: TRUE
+VignetteBuilder: knitr
+Suggests:
+    knitr,
+    BiocStyle
 License: MIT
