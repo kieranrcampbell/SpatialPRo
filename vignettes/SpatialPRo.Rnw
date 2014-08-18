@@ -1,0 +1,44 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{SpatialPRo vignette}
+%\VignetteKeywords{Bioinformatics, Proteomics}
+%\VignettePackage{SpatialPRo}
+
+\documentclass{article}
+
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+\title{SpatialPRo: spatially resolved proteomics data}
+\author{Kieran Campbell\\ \texttt{kieran.campbell@dpag.ox.ac.uk}}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\section{Introduction}
+\Rpackage{SpatialPRo} provides classes and methods for handling single-cell spatially resolved proteomics data. It provides two classes: \Rclass{SPExp} to represent an entire spatial proteomics experiment, and \Rclass{SPData} to represent a single sample (for example a tissue section from a tumour). Also provided are methods for subsetting by tissue and channel measurement, as well as basic normalisation and clustering methods.
+
+\subsection{Basic concepts}
+In a spatial proteomics experiment, it is likely several \emph{samples} are taken. For example, each sample could be a tissue biopsy from a given patient. The class \Rclass{SPData} represents a particular sample, and holds the single-cell data along with the associated meta-data, such as cell location, sample ID and channel names.
+
+Multiple samples (for example across different patients, or repeat experiments from a given patient) define the overall experiment, represented by the class \Rclass{SPExp}. An instance of this class contains a list of \Rclass{SPData} objects, along with the associated file names and experiment directory. 
+
+If the experiment is multiplexed, multiple \emph{channels} may be measured simulatenously. These channels can be proteins and protein modifcations - the terms ``channels" and ``proteins" are used interchangeably. 
+
+\section{SPExp}
+\Rpackage{SpatialPRo} can be loaded in the usual way, and comes with \Rcode{SPE}, an example instance of \Rclass{SPExp}:
+<<SPE1, eval=TRUE>>=
+library(SpatialPRo)
+data(SPE_report)
+SPE
+@
+
+\section{SPData}
+
+
+
+ 
+
+
+\end{document}
