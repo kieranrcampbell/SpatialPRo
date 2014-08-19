@@ -120,4 +120,5 @@ findBoundary <- function(sp) {
     any(nn.id %in% cl1)
   })
   boundary <- sort(c(cl1[cell1neighbours], cl2[cell2neighbours]))
+  return( boundary )
 }

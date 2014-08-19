@@ -210,6 +210,11 @@ setValidity("SPData", function(object) {
         valid <- FALSE
         msg <- c(msg, "Number of proteins must be equal to number of columns in cell by protein matrix")
     }
+    
+    if(length(cellClass(object)) > 0 && length(cellClass(object)) != nCells(object)) {
+      valid  <- FALSE
+      msg  <- c(msg, "Length of cell class vector doesn't match number of cells")
+    }
 
     if(valid) TRUE else msg
 
@@ -234,6 +239,9 @@ setValidity("SPData", function(object) {
 setMethod("[", "SPData", function(x, i, j) {
     if(missing(j)) j <- 1:nChannel(x)
     if(missing(i)) i <- 1:nCells(x)
+    
+    if(is.logical(i)) i <- which(i)
+    if(is.logical(j)) j <- which(j)
 
     .n.proteins <- length(j)
     .channelNames <- channels(x)[j]
@@ -241,13 +249,13 @@ setMethod("[", "SPData", function(x, i, j) {
     .weight <- weight(x)[i]
     .nnid <- neighbourIDs(x)[i]
     .cell.class <- cellClass(x)[i]
-    .pos <- xy(x)[i,]
+    .pos <- xy(x)[i,,drop=FALSE]
 
     ## if dealing with single cell, .pos will become vector:
     if(!is.matrix(.pos)) .pos <- t(as.matrix(.pos))
     
-    .Y <- as.matrix(cells(x)[i,j, drop=FALSE])
-    .raw <- as.matrix(rawData(x)[i,j, drop=FALSE])
+    .Y <- cells(x)[i,j, drop=FALSE]
+    .raw <- rawData(x)[i,j, drop=FALSE]
 
     .X <- neighbourChannel(neighbours(sp), j)
 
@@ -268,8 +276,6 @@ setMethod("[", "SPData", function(x, i, j) {
 ###########################################
 
 
-
-
 #' @rdname cellclass-methods
 #' @aliases cellClass,SPData-methods
 setMethod("cellClass", signature="SPData", function(object) object@cellClass)
@@ -279,8 +285,9 @@ setMethod("cellClass", signature="SPData", function(object) object@cellClass)
 #' @aliases cellClass<-,SPData-methods
 setReplaceMethod("cellClass", signature="SPData",
                  function(object, value) {
-                     object@cellClass <- value
-                     return(object)
+                   if(length(value) != nCells(object)) stop("Length of class vector different to number of cells in SPData object")                   
+                   object@cellClass <- value
+                   return(object)
                  })
 
 #' @rdname neighbourclass-methods
@@ -288,18 +295,18 @@ setReplaceMethod("cellClass", signature="SPData",
 setMethod("neighbourClass", signature("SPData","numeric"),
           function(object, cell.class) {
               if(!(cell.class %in% cellClass(object))) stop("Cell class not present in tissue")
-              X <- neighbours(sp)
-              nn.ids <- neighbourIDs(sp)
-              cell.select <- which(cellClass(sp) == cell.class)
+              X <- neighbours(object)
+              nn.ids <- neighbourIDs(object)
+              cell.select <- which(cellClass(object) == cell.class)
 
               nn <- lapply(1:length(X), function(i) {
                   Xi <- X[[i]] ; ids <- nn.ids[[i]]
 
                   lvec <- ids %in% cell.select
                   if(is.matrix(Xi)) {
-                      if(any(lvec)) return(Xi[lvec,]) else return(numeric(0))
+                    if(any(lvec)) return(Xi[lvec,,drop=FALSE]) else return( NA )
                   } else {
-                      if(lvec) return(Xi) else return(numeric(0))
+                    if(is.na(Xi)) return( NA ) else stop("Nearest neighbour matrix must be matrix or NA")  
                   }
               })
               nn

@@ -26,7 +26,7 @@ In a spatial proteomics experiment, it is likely several \emph{samples} are take
 
 Multiple samples (for example across different patients, or repeat experiments from a given patient) define the overall experiment, represented by the class \Rclass{SPExp}. An instance of this class contains a list of \Rclass{SPData} objects, along with the associated file names and experiment directory. 
 
-If the experiment is multiplexed, multiple \emph{channels} may be measured simulatenously. These channels can be proteins and protein modifcations - the terms ``channels" and ``proteins" are used interchangeably. 
+If the experiment is multiplexed, multiple \emph{channels} may be measured simulatenously. These channels can be proteins and protein modifications - the terms ``channels" and ``proteins" are used interchangeably. 
 
 \section{SPExp}
 \Rpackage{SpatialPRo} can be loaded in the usual way, and comes with \Rcode{SPE}, an example instance of \Rclass{SPExp}:
@@ -123,12 +123,39 @@ neighbours(sps)[[1]]
 @
 
 \subsection{Cell class operations}
+In many tissue samples there will be multiple cell types - for example, in tumour tissue there will be epithelial, stromal and immune cells present. In \Rpackage{SpatialPRo} the cell type is known as its \emph{class}. Cell class can be set and retrieved using the \Rcode{cellClass} method:
+<<class1>>=
+cellClass(sps)
+cellClass(sps) <- c(2,1,2)
+cellClass(sps)
+@
+Therefore the cell-by-channel matrix can easily be found for a particular class of cell:
+<<Y1>>=
+cells(sps[cellClass(sps) == 1,])
+@
+\subsubsection{Regression at a boundary}
+We can also extract the neighbour data for cells just belonging to one class. This is particularly useful for any modelling done at a boundary - if we want to see how cells of type 1 are affected by type 2, we would use the \Rcode{neighbourClass} function to get a list of neighbouring cells only of a given class:
+<<nn1>>=
+nn2 <- neighbourClass(sp,2) # nearest neighbour list containing only cells of type 2
+@
 
+We would then use the \Rcode{findBoundary} function to find which cells lie along the boundary:
+<<boundary>>=
+boundary.cells  <- findBoundary(sp)
+@
+This is only currently implemented for two types of cells. Then we would find the cells of type 1 that lie along the boundary:
+<<b2>>=
+type1.boundary <- intersect(which(cellClass(sp) == 1), boundary.cells)
+@
+We can then set up our boundary regression:
+<<regress>>=
+sp.boundary <- sp[type1.boundary,]
+neighbours(sp.boundary) <- nn2[type1.boundary]
 
-\section{Normalisation \& Classification}
+Y <- cells(sp.boundary)
+X <- neighbourMean(sp.boundary, useWeights = FALSE, normalise = TRUE)
 
-
- 
-
-
+fit <- lm(Y ~ X)
+@
+%\subsection{Other methods}
 \end{document}
