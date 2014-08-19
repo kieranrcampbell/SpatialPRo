@@ -27,9 +27,10 @@ SPData <- setClass(Class = "SPData",
                        weights = "list",
                        pos = "matrix", # nCell by 2 matrix of cell locations
                        cellClass = "numeric"))
-
+#' Some text
+#' @name cells
 #' @rdname cells-methods
-#' @aliases cells,SPData-methods
+#' @aliases cells,SPData-method
 setMethod(f = "cells",
           signature = "SPData",
           definition = function(object) object@readouts )
@@ -266,46 +267,7 @@ setMethod("[", "SPData", function(x, i, j) {
 ## Methods for neighbours and cell class ##
 ###########################################
 
-#' @rdname neighbourmean-methods
-#' @name neighbourMean
-#' @aliases neighbourMean,SPData-methods
-setMethod(f = "neighbourMean",
-          signature = signature("SPData", "logical", "logical"),
-          def = function(object, useWeights, normalise) {
-              #if(missing(useWeights)) useWeights <- FALSE
-              #if(missing(normalise)) normalise <- TRUE
 
-
-              ## average over nearest neighbours then means
-              X <- neighbours(object)
-              weights <- NULL
-              if(useWeights) weights <- weight(object)
-
-              X <- lapply(1:length(X), function(i) {
-                  nn <- X[[i]]
-
-                  if(is.matrix(nn)) {
-                      if(useWeights) {
-                          w <- weights[[i]]
-                          total.boundary <- sum(w)
-                          nn <- nn * w / total.boundary ## IMPORTANT: matrix * vector multiplication is by column
-                          return( colSums(nn) )
-                      } else {
-                          return( colMeans(nn) )
-                      }
-                  }
-                  else {
-                      return( nn )
-                  }
-              })
-
-              X <- matrix(unlist(X), nrow=length(X), byrow=TRUE)
-
-              if(normalise) X <- apply(X, 2, function(x) (x - mean(x))/sd(x))
-
-              colnames(X) <- channels(object)
-              X
-          })
 
 
 #' @rdname cellclass-methods
@@ -343,76 +305,11 @@ setMethod("neighbourClass", signature("SPData","numeric"),
               nn
           })
 
-#' Selects only particular channels to be returned as nearest neighbours
-#'
-#' @param NN The list of matrices of neighbour data (e.g. from \code{neighbours(sp)} )
-#' @param channel.ids A channel list to select out
-#'
-#' @export
-neighbourChannel <- function(NN, channel.ids) {
-  ## the trick with this function is to make sure each element in the nearest neighbour
-  ## list arrives as a matrix and leaves as a matrix. R will reduce an
-  nn <- lapply(NN, function(Xi) {
-    if(!is.matrix(Xi)) {
-      if(is.na(Xi)) { 
-        return( NA ) 
-      } else {
-        stop("Dimensionality lost in neighbour subsetting")        
-      }
-    } else {
-      return( Xi[,channel.ids, drop = FALSE] )
-    }
-  })
-  return(nn)
-}
-
-#' Generate nearest neighbour data
-#' 
-#' Some processing may be performed on the cell-by-channel matrix and the nearest neighbour
-#' data needs updated. Note that the class architecture means that when the neighbours of a cell
-#' are requested, it is not generated fresh from the cell matrix but retreived from a separate copy 
-#' specifically for neighbour data. Therefore, if any transformations are applied to the neighbour
-#' data, you will need to regenerate them using this function.
-#' 
-#' @param sp The \code{SPData} object to use
-#' @return A \code{SPData} object with the neighbour data regenerated
-#' 
-#' @export
-generateNeighbourfromID <- function(sp) {
-  Y <- cells(sp)
-  X <- lapply(neighbourIDs(sp), function(id) Y[id, ])
-  neighbours(sp) <- X
-  return ( sp )
-}
 
 
-#' Cells on a class boundary
-#'
-#' Find the cells that lie on the boundary between two classes
-#' (currently only implemented for 2 classes)
-#'
-#' @param sp The SPData object to use
-#'
-#' @return A vector of cell identifiers relating to those
-#' that lie along the boundary
-#'
-#' @export
-findBoundary <- function(sp) {
-    classes <- cellClass(sp)
-    cl1 <- which(classes == 1) ; cl2 <- which(classes == 2)
-    nn.ids <- neighbourIDs(sp)
 
-    cell1neighbours <- sapply(cl1, function(cellid) {
-        nn.id <- nn.ids[[cellid]]
-        any(nn.id %in% cl2)
-    })
 
-    cell2neighbours <- sapply(cl2, function(cellid) {
-        nn.id <- nn.ids[[cellid]]
-        any(nn.id %in% cl1)
-    })
-    boundary <- sort(c(cl1[cell1neighbours], cl2[cell2neighbours]))
-}
+
 
 
 

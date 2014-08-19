@@ -93,7 +93,6 @@ setMethod("[", "SPExp",
           function(x, i) {
               x@files <- files(x)[i]
               x@spdata <- x@spdata[i]
-              x@ids <- x@ids[i]
               return(x)
           })
 
@@ -162,7 +161,7 @@ SPExperimentfromDir <- function(directory, files=NULL) {
     ids <- sapply(filesToLoad, getIDfromTMAname)
     names(ids) <- NULL
     sps <- lapply(1:length(ids), function(i) { loadCells(filesToLoad[i], ids[i])})
-    return(SPExperiment(directory, files, sps, ids))
+    return(SPExperiment(directory, files, sps))
 }
 
 getIDfromTMAname <- function(str) {
@@ -252,8 +251,7 @@ ConstructSampleFactors <- function(XY, sample.ids) {
 #'
 #' @docType data
 #' @keywords SPExp
-#' @name SPE_report
-#' @usage data(SPE_report)
+#' @name spe
+#' @usage data(spe)
 #' @format An SPExp object with 5 samples
-#' @export
 NULL

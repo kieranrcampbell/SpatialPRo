@@ -1,5 +1,5 @@
 
-data(SPE_report)
+data(SPE)
 
 
 ncells <- 5

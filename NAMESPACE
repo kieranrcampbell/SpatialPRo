@@ -2,10 +2,8 @@
 
 export(BindSPE)
 export(ConstructSampleFactors)
-export(SPE_report)
 export(SPExperiment)
 export(SPExperimentfromDir)
-export(SpatialPRo)
 export(boxplots)
 export(channelCorr)
 export(channelPlot)

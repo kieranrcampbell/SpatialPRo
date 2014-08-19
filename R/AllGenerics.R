@@ -16,6 +16,7 @@
 #' @name cells
 #' @rdname cells-methods
 #' @exportMethod cells
+#' @docType methods
 setGeneric(name = "cells",
            def = function(object) standardGeneric("cells"))
 
@@ -203,27 +204,6 @@ setGeneric(name = "xy<-",
 #################################
 ## Class and neighbour methods ##
 #################################
-
-#' Average over nearest neighbours
-#'
-#' Given the nearest neighbour measurements, average over the
-#' nearest neighbours of each cell, with optional boundary
-#' weights.
-#'
-#' @param object The SPData object to use
-#' @param useWeights If TRUE then the mean is weighted using the
-#' relative boundary weights. If FALSE then the normal mean is taken
-#' over the nearest neighbours.
-#' @param normalise If TRUE each channel is centre-scaled to mean 0
-#' and standard deviation 1.
-#'
-#' @return A matrix of dimension \emph{n} by \emph{p} for
-#' \emph{n} cells and \emph{p} nearest neighbours.
-#' @rdname neighbourmean-methods
-#' @exportMethod neighbourMean
-setGeneric(name = "neighbourMean",
-           def = function(object, useWeights, normalise)
-           standardGeneric("neighbourMean"))
 
 #' Classes of each cell
 #'

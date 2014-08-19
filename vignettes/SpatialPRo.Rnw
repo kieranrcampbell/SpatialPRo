@@ -9,7 +9,7 @@
 BiocStyle::latex()
 @
 
-\title{SpatialPRo: spatially resolved proteomics data}
+\title{SpatialPRo: methods for spatial proteomics data}
 \author{Kieran Campbell\\ \texttt{kieran.campbell@dpag.ox.ac.uk}}
 
 \begin{document}
@@ -18,6 +18,8 @@ BiocStyle::latex()
 \tableofcontents
 \section{Introduction}
 \Rpackage{SpatialPRo} provides classes and methods for handling single-cell spatially resolved proteomics data. It provides two classes: \Rclass{SPExp} to represent an entire spatial proteomics experiment, and \Rclass{SPData} to represent a single sample (for example a tissue section from a tumour). Also provided are methods for subsetting by tissue and channel measurement, as well as basic normalisation and clustering methods.
+
+A major advantage of spatially-resolved proteomics data is the availability of neighbour data for cells. While many studies have looked at within-cell signalling pathways, it is now possible to examine dependencies between neighbouring cells to elucidate spatial signalling pathways. Therefore, particular emphasis is put on methods that provide easy access to the neighbour data for a given cell.
 
 \subsection{Basic concepts}
 In a spatial proteomics experiment, it is likely several \emph{samples} are taken. For example, each sample could be a tissue biopsy from a given patient. The class \Rclass{SPData} represents a particular sample, and holds the single-cell data along with the associated meta-data, such as cell location, sample ID and channel names.
@@ -28,14 +30,102 @@ If the experiment is multiplexed, multiple \emph{channels} may be measured simul
 
 \section{SPExp}
 \Rpackage{SpatialPRo} can be loaded in the usual way, and comes with \Rcode{SPE}, an example instance of \Rclass{SPExp}:
-<<SPE1, eval=TRUE>>=
-library(SpatialPRo)
-data(SPE_report)
+<<SPE1, eval=TRUE, message=FALSE>>=
+library(devtools)
+load_all("~/software/SpatialPRo")
+data(SPE)
 SPE
+@
+We can also view the sample IDs, original filenames and locations:
+<<SPE2, eval=TRUE>>=
+IDs(SPE)
+files(SPE)
+getDir(SPE)
+@
+
+Furthermore, we can subset \Rclass{SPExp} objects and extract the \Rclass{SPData} object at any position:
+
+<<SPE3, eval=TRUE>>=
+SPE[2:3] # subset the second and third samples
+SPE[[4]] # extract the SPData object in the fourth slot
 @
 
 \section{SPData}
+The \Rclass{SPData} object represents an individual sample and is in practice what is used in analysis. As before, we can extract an \Rcode{SPData} instance from \Rcode{SPExp}:
 
+<<spdata, eval=TRUE>>=
+sp  <- SPE[[1]]
+sp
+@
+
+\subsection{Accessing data in a \Rclass{SPData} object}
+From an instance of \Rclass{SPData} we can extract all the information from a sample, including:
+\begin{itemize}
+\item Raw data matrix (cell-by-channel)
+\item Normalised data matrix (cell-by-channel)
+\item Cell locations (cell-by-2)
+\item Cell sizes
+\item Number of cells
+\item Number of channels
+\item Channel names
+\item Sample ID
+\end{itemize}
+
+<<spdata-methods,eval=TRUE>>=
+rawData(sp)[1:2,1:4] # un-normalised data
+cells(sp)[1:2,1:4] # normalised data
+head(xy(sp)) # cell locations
+head(size(sp)) # cell sizes
+nCells(sp) # number of cells
+nChannel(sp) # number of channels
+head(channels(sp)) # channel names
+ID(sp) # sample ID
+@
+
+\subsection{Neighbour information}
+We can access the neighbour data of the sample by calling
+<<n1, eval=TRUE>>=
+nn  <- neighbours(sp)
+length(nn)
+dim(nn[[1]])
+@
+which returns a list of length \Rcode{nCells(sp)}, where each entry is an m-by-channel matrix for m nearest neighbours of a given cell. We can also retrieve the mean over the nearest neighbours for each cell:
+<<n2>>=
+nn.mean  <- neighbourMean(sp, useWeights=FALSE, normalise=TRUE)
+dim(nn.mean)
+nn.mean[1:2,c(2,5,7)]
+@
+If the class has boundary weight data, \Rcode{useWeights=TRUE} will weight the average by the relative boundary size between the cells. If \Rcode{normalise=TRUE} then each column is centred-scaled to mean 0 and standard deviation 1.
+
+\subsection{Subsetting \Rclass{SPData} objects}
+An \Rclass{SPData} object can be subsetted to include only a selection of cells and/or channels. Subsetting \Rclass{SPData} objects is identical to subsetting the underlying matrix - if we wish to select out cells \Rcode{i} and channels \Rcode{j} then we use the \Rcode{R} operation \Rcode{[}. For example, if we want to extract the sample containing the first 3 cells with channels 5 and 7, we would call
+<<subset1, eval=TRUE>>=
+sps  <- sp[1:3,c(5,7)]
+sps
+@
+This will also subset the cell sizes, locations and channels:
+<<subset2, eval=TRUE>>=
+size(sps)
+xy(sps)
+channels(sps)
+@
+
+When reducing the \Rclass{SPData} object down to a subset of cells, it is often preferable to keep the nearest neighbour measurements for all cells in the subset, regardless of whether those neighbours themselves are actually in the subset. For example, consider cell 1, with neighbours 2, 3 and 4 (who each have some different set of neighbours). If we subset the \Rclass{SPData} to cells 1 \& 4, we don't wish to remove neighbours 2 and 3 from 1, since they are physically present in any interaction. Therefore, while the neighbour data for any cells not in the subset is removed, those cells aren't removed from the neighbour data for cells in the subset. We can see this by looking at the neighbour data for \Rcode{sp} and \Rcode{sps}:
+<<subset3>>=
+length(neighbours(sp)) # list with an entry for each cell
+length(neighbours(sps)) 
+
+dim(neighbours(sp)[[1]]) # a neighbour-by-channel matrix for the first cell
+
+## neighbour-by-channel matrix for first cell in reduced set 
+## - only channels change
+neighbours(sps)[[1]] 
+@
+
+\subsection{Cell class operations}
+
+
+\section{Normalisation \& Classification}
 
 
  
