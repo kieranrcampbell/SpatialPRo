@@ -19,7 +19,7 @@
 #' @return A matrix of dimension \emph{n} by \emph{p} for
 #' \emph{n} cells and \emph{p} nearest neighbours.
 #' @rdname neighbourmean-methods
-#' @exportMethod neighbourMean
+#' @export
 neighbourMean  <-  function(object, useWeights = FALSE, normalise = TRUE) {
   ## average over nearest neighbours then means
   X <- neighbours(object)

@@ -1,1 +1,6 @@
 .git/
+.Rhistory
+R/.Rhistory
+data/.DS_Store
+matlab/.DS_Store
+..Rcheck
