@@ -158,6 +158,8 @@ setGeneric(name = "ID",
 #' Get and set the sample ID
 #'
 #' Set the sample ID.
+#' 
+#' @param value The new sample ID
 #'
 #' @name ID<-
 #' @rdname id-methods
@@ -174,6 +176,9 @@ setGeneric(name = "ID<-",
 #'
 #' @name neighbourIDs
 #' @rdname neighbourid-methods
+#' 
+#' @param object The \code{SPData} object from which to extract the neighbour IDs.
+#' 
 #' @exportMethod neighbourIDs
 setGeneric(name = "neighbourIDs",
            def = function(object) standardGeneric("neighbourIDs"))
@@ -193,6 +198,8 @@ setGeneric(name = "xy",
 #' 2D Cell Coordinates
 #'
 #' Set the cell coordinates.
+#' 
+#' @param value New cell coordinanes. Must be an ncell-by-2 matrix.
 #'
 #' @name xy<-
 #' @rdname xy-methods
@@ -219,6 +226,8 @@ setGeneric(name = "cellClass",
            def = function(object) standardGeneric("cellClass"))
 
 #' Classes of each cell
+#' 
+#' @param value A new vector of cell classes. Must be the same length as the number of cells.
 #'
 #' @rdname cellclass-methods
 #' @name cellClass<-

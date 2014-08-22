@@ -12,7 +12,7 @@
 #' cell measurements, size and classification.
 #'
 #' @name SPData-class
-#' @rdname SPData-class
+#' @rdname spdata-class
 #' @aliases SPData
 #'
 #' @exportClass SPData
@@ -32,13 +32,13 @@ SPData <- setClass(Class = "SPData",
 #' @rdname cells-methods
 #' @aliases cells,SPData-method
 setMethod(f = "cells",
-          signature = "SPData",
+          signature = signature(object="SPData"),
           definition = function(object) object@readouts )
 
 #' @rdname cells-methods
-#' @name cells<-
-#' @aliases cells<-,SPData-methods
-setReplaceMethod("cells", signature = "SPData",
+#' @name cells
+#' @aliases cells<-,SPData,matrix-method cells<-,SPData-method
+setReplaceMethod("cells", signature(object="SPData",value="matrix"),
                  function(object, value) {
                      object@readouts <- value
                      validObject(object)
@@ -46,31 +46,31 @@ setReplaceMethod("cells", signature = "SPData",
                  })
 
 #' @rdname raw-methods
-#' @aliases rawData,SPData-methods
+#' @aliases rawData,SPData-method
 setMethod(f = "rawData",
           signature = "SPData",
           definition = function(object) object@raw)
 
 #' @rdname nCells-methods
-#' @aliases nCells,SPData-methods
+#' @aliases nCells,SPData-method
 setMethod(f = "nCells",
           signature = "SPData",
           definition = function(object) dim(object@raw)[1] )
 
 #' @rdname nChannel-methods
-#' @aliases nChannel,SPData-methods
+#' @aliases nChannel,SPData-method
 setMethod(f = "nChannel",
           signature = "SPData",
           definition = function(object) dim(object@readouts)[2] )
 
 #' @rdname channels-methods
-#' @aliases channels,SPData-methods
+#' @aliases channels,SPData-method
 setMethod(f = "channels",
           signature = "SPData",
           definition = function(object) object@channelNames )
 
 #' @rdname neighbours-methods
-#' @aliases neighbours,SPData-methods
+#' @aliases neighbours,SPData-method
 setMethod(f = "neighbours",
           signature = "SPData",
           definition = function(object) {
@@ -78,9 +78,9 @@ setMethod(f = "neighbours",
 })
 
 #' @rdname neighbours-methods
-#' @name neighbours<-
-#' @aliases neighbours<-,SPData-methods
-setReplaceMethod("neighbours", signature = "SPData",
+#' @name neighbours
+#' @aliases neighbours<-,SPData-method neighbours<-,SPData,list-method
+setReplaceMethod("neighbours", signature = signature(object="SPData",value="list"),
                  function(object, value) {
                      object@cellNeighbours <- value
                      validObject(object)
@@ -89,22 +89,22 @@ setReplaceMethod("neighbours", signature = "SPData",
 
 
 #' @rdname size-methods
-#' @aliases size,SPData-methods
+#' @aliases size,SPData-method
 setMethod(f = "size",
           signature = "SPData",
           definition = function(object) object@size)
 
 #' @rdname weight-methods
-#' @aliases weight,SPData-methods
+#' @aliases weight,SPData-method
 setMethod(f = "weight",
           signature = "SPData",
           def = function(object) object@weights)
 
 #' @rdname weight-methods
 #' @name weight<-
-#' @aliases weight<-,SPData-methods
+#' @aliases weight<-,SPData-method weight<-,SPData,list-method
 setReplaceMethod(f = "weight",
-                 signature="SPData",
+                 signature=signature(object="SPData",value="list"),
                  function(object, value) {
                      object@weights <- value
                      return(object)
@@ -121,44 +121,47 @@ setReplaceMethod(f = "weight",
 #' @param x The SPData object to use
 #' @name dim
 #' @rdname dim-methods
+#' @aliases dim,SPData-method
 #' @exportMethod dim
 setMethod(f = "dim",
           signature = "SPData",
           def  = function(x) c(nCells(x), nChannel(x)))
 
 #' @rdname id-methods
-#' @aliases ID,SPData-methods
+#' @aliases ID,SPData-method
 setMethod(f = "ID",
           signature = "SPData",
           def  = function(object) object@id)
 
 #' @name ID<-
 #' @rdname id-methods
-#' @aliases ID<-,SPData-methods
+#' @aliases ID<-,SPData-method ID<-,SPData,numeric-method
 setReplaceMethod(f = "ID",
-                 signature = "SPData",
+                 signature = signature(object="SPData", value="numeric"),
                  function(object, value) {
                      object@id <- value
                      return(object)
                  })
 
 #' @rdname neighbourid-methods
-#' @aliases neighbourIDs,SPData-methods
+#' @aliases neighbourIDs,SPData-method
 setMethod(f = "neighbourIDs",
           signature = "SPData",
           def = function(object) object@nn.ids)
 
 #' @rdname xy-methods
-#' @aliases xy,SPData-methods
+#' @aliases xy,SPData-method
 setMethod(f = "xy",
           signature = "SPData",
           def = function(object) object@pos)
 
+
 #' @rdname xy-methods
-#' @aliases xy<-,SPData-methods
+#' @aliases xy<-,SPData,matrix-method xy<-,SPData-method
 #' @name xy<-
+#' @exportMethod xy<-
 setReplaceMethod(f = "xy",
-                 signature="SPData",
+                 signature=signature(object="SPData",value="matrix"),
                  function(object, value) object@pos <- xy)
 
 
@@ -225,18 +228,28 @@ setValidity("SPData", function(object) {
 #'
 #' Select SPData[i,j] for cells \code{i} and channels \code{j}.
 #' Note that this does not subset out nearest neighbours also.
+#' 
+#' @name [
 #'
 #' @param i Cells to subset
 #' @param j Channels to subset
-#' @name [
 #'
 #' @return An SPData object reduced to cells \code{i} and channels \code{j}
 #'
-#' @aliases [,SPData-methods
+#' @aliases [,SPData-method [,SPData,ANY,ANY,ANY-method
+#' 
 #' @rdname extract-methods
-#'
-#' @export
-setMethod("[", "SPData", function(x, i, j) {
+#' @docType methods
+#' @exportMethod [
+#' @examples 
+#' \dontrun{
+#' ## subset to cells 1,3,5 and channels 8 to 10:
+#' i <- c(1,3,5)
+#' j <- 8:10
+#' sp.reduced <- sp[i,j]
+#' }
+#' 
+setMethod("[", signature(x="SPData",i="ANY",j="ANY"), function(x, i, j) {
     if(missing(j)) j <- 1:nChannel(x)
     if(missing(i)) i <- 1:nCells(x)
     
@@ -277,13 +290,13 @@ setMethod("[", "SPData", function(x, i, j) {
 
 
 #' @rdname cellclass-methods
-#' @aliases cellClass,SPData-methods
+#' @aliases cellClass,SPData-method
 setMethod("cellClass", signature="SPData", function(object) object@cellClass)
 
 #' @name cellClass<-
 #' @rdname cellclass-methods
-#' @aliases cellClass<-,SPData-methods
-setReplaceMethod("cellClass", signature="SPData",
+#' @aliases cellClass<-,SPData-method cellClass<-,SPData,numeric-method
+setReplaceMethod("cellClass", signature=signature(object="SPData", value="numeric"),
                  function(object, value) {
                    if(length(value) != nCells(object)) stop("Length of class vector different to number of cells in SPData object")                   
                    object@cellClass <- value
@@ -291,7 +304,7 @@ setReplaceMethod("cellClass", signature="SPData",
                  })
 
 #' @rdname neighbourclass-methods
-#' @aliases neighbourClass,SPData-methods
+#' @aliases neighbourClass,SPData-method
 setMethod("neighbourClass", signature("SPData","numeric"),
           function(object, cell.class) {
               if(!(cell.class %in% cellClass(object))) stop("Cell class not present in tissue")

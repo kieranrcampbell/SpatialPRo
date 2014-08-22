@@ -17,6 +17,9 @@ SPExp <- setClass("SPExp",
                       spdata = "list"))
 
 
+#' Displays content of \code{SPExp} object
+#' 
+#' @aliases show,SPExp-method
 #' @export
 setMethod("show", "SPExp", function(object) {
     cat("An object of class ", class(object), "\n",sep="")
@@ -52,8 +55,15 @@ setMethod(f = "IDs",
           definition = function(object) sapply(SPlist(object), ID))
 
 
+#' Initialize SPExp
+#' 
+#' @param dir The \code{SPExp} directory
+#' @param files A list of the original experiment filenames
+#' @param spdata A list of \code{SPData} objects
+#' 
+#' @aliases initialize,SPExp-method
 #' @export
-setMethod("initialize", "SPExp",
+setMethod("initialize", signature=signature("SPExp"),
           function(.Object, dir, files, spdata) {
               .Object@dir <- dir
               .Object@files <- files
@@ -85,9 +95,9 @@ setMethod("loadExp", "SPExp",
 #' @param x The \code{SPExp} instance to subset
 #' @param i The samples to retain
 #' @name [
-#' @aliases [,SPExp-methods
+#' @aliases [,SPExp-method
 #' @return A subsetted \code{SPExp} object
-#' @rdname extract-methods
+#' @rdname spexp-extract-methods
 #' @exportMethod [
 setMethod("[", "SPExp",
           function(x, i) {
@@ -105,11 +115,11 @@ setMethod("[", "SPExp",
 #'
 #' @return The \code{SPData} object in slot \code{i} of the \code{SPExp} instance
 #' @name [[
-#' @aliases [[,SPExp-methods
+#' @aliases [[,SPExp-method [[,SPExp,numeric-method
 #' @rdname dextract-methods
 #' @exportMethod [[
 setMethod(f = "[[",
-          signature = "SPExp",
+          signature = signature(x="SPExp",i="numeric"),
           function(x,i) {
               return( x@spdata[[i]])
           })
@@ -121,12 +131,11 @@ setMethod(f = "[[",
 #' @param i The index of the \code{SPData} object within the \code{SPExp} to set
 #' @param value An object of class \code{SPData} to replace slot \code{i}
 #'
-#' @name [[<-
-#' @aliases [[,SPExp-methods
-#' @rdname dextract-methods
-#' @exportMethod [[
+#' @name [[
+#' @aliases [[<-,SPExp-method [[<-,SPExp,numeric,missing,SPData-method
+#' @rdname spexp-single-extract-methods
 setReplaceMethod(f = "[[",
-                 signature = "SPExp",
+                 signature = signature(x="SPExp",i="numeric",j="missing",value="SPData"),
                  definition = function(x,i, value) {
                      x@spdata[[i]] <- value
                      x
@@ -137,11 +146,19 @@ setReplaceMethod(f = "[[",
 #' @name length
 #' @param x \code{SPExp instance to use}
 #' @return Number of samples in the \code{SPExp} instance
+#' 
+#' @aliases length,SPExp-method
 #' @export
 setMethod(f = "length",
           signature = "SPExp",
           def = function(x) length(x@spdata))
 
+#' Create a new \code{SPExp} object
+#' 
+#' @param dir Experiment directory
+#' @param files Experiment file names
+#' @param spdata The list of \code{SPData} objects
+#'  
 #' @export
 SPExperiment <- function(dir, files, spdata) {
   return ( new("SPExp", dir, files, spdata) )
@@ -155,7 +172,8 @@ SPExperiment <- function(dir, files, spdata) {
 #'
 #' @docType data
 #' @keywords SPExp
-#' @name spe
-#' @usage data(spe)
+#' @name SPE
+#' @usage data(SPE)
+#' @rdname SPE-data
 #' @format An SPExp object with 5 samples
 NULL

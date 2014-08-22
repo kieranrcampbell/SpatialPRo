@@ -1,6 +1,7 @@
 Package: SpatialPRo
-Title: Containers and methods for spacial proteomics data
-Description: First attempt at package
+Title: SpatialPRo: methods for spacial proteomics data
+Description: SpatialPRo provides methods for handling two-dimensional spatially
+    resolved proteomics data.
 Version: 0.1
 Author: Kieran Campbell
 Maintainer: Kieran Campbell <kieran.campbell@dpag.ox.ac.uk>
@@ -11,7 +12,8 @@ Imports:
     R.matlab,
     ggplot2,
     reshape,
-    corrplot
+    corrplot,
+    methods
 LazyData: TRUE
 VignetteBuilder: knitr
 Suggests:

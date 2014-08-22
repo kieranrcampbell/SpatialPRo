@@ -20,7 +20,6 @@
 loadCells <- function(filename,
                       id=-1,
                       control.isotopes = c("Xe131","Cs133","Ir193")) {
-  require(R.matlab)
   
   ## loads relevant data from matlab and parses into list
   
