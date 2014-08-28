@@ -270,7 +270,7 @@ setMethod("[", signature(x="SPData",i="ANY",j="ANY"), function(x, i, j) {
     .Y <- cells(x)[i,j, drop=FALSE]
     .raw <- rawData(x)[i,j, drop=FALSE]
 
-    .X <- neighbourChannel(neighbours(sp), j)
+    .X <- neighbourChannel(neighbours(x), j)
 
     .X <- .X[i]
 

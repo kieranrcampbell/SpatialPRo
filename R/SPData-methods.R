@@ -23,6 +23,7 @@
 neighbourMean  <-  function(object, useWeights = FALSE, normalise = TRUE) {
   ## average over nearest neighbours then means
   X <- neighbours(object)
+  
   weights <- NULL
   if(useWeights) weights <- weight(object)
   
@@ -44,8 +45,8 @@ neighbourMean  <-  function(object, useWeights = FALSE, normalise = TRUE) {
     }
   })
   
-  X <- matrix(unlist(X), nrow=length(X), byrow=TRUE)
-  
+  X <- matrix(unlist(X), nrow=nCells(object), ncol=nChannel(object), byrow=TRUE)
+
   if(normalise) X <- apply(X, 2, function(x) (x - mean(x))/sd(x))
   
   colnames(X) <- channels(object)
@@ -61,6 +62,7 @@ neighbourMean  <-  function(object, useWeights = FALSE, normalise = TRUE) {
 neighbourChannel <- function(NN, channel.ids) {
   ## the trick with this function is to make sure each element in the nearest neighbour
   ## list arrives as a matrix and leaves as a matrix. R will reduce an
+  
   nn <- lapply(NN, function(Xi) {
     if(!is.matrix(Xi)) {
       if(is.na(Xi)) { 
@@ -69,7 +71,8 @@ neighbourChannel <- function(NN, channel.ids) {
         stop("Dimensionality lost in neighbour subsetting")        
       }
     } else {
-      return( Xi[,channel.ids, drop = FALSE] )
+      Xi <- Xi[,channel.ids, drop = FALSE]
+      return( Xi )
     }
   })
   return(nn)
@@ -121,4 +124,13 @@ findBoundary <- function(sp) {
   })
   boundary <- sort(c(cl1[cell1neighbours], cl2[cell2neighbours]))
   return( boundary )
+}
+
+checkNeighbours <- function(sp) {
+  null <- sapply(neighbours(sp), function(nn) {
+    if(!is.matrix(nn)) {
+      print(nn)
+      stop("nn not matrix")
+    }
+  })
 }
