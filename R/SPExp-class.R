@@ -173,7 +173,6 @@ SPExperiment <- function(dir, files, spdata) {
 #' @docType data
 #' @keywords SPExp
 #' @name SPE
-#' @usage data(SPE)
 #' @rdname SPE-data
 #' @format An SPExp object with 5 samples
 NULL
