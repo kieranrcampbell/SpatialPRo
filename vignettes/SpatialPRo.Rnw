@@ -31,8 +31,7 @@ If the experiment is multiplexed, multiple \emph{channels} may be measured simul
 \section{SPExp}
 \Rpackage{SpatialPRo} can be loaded in the usual way, and comes with \Rcode{SPE}, an example instance of \Rclass{SPExp}:
 <<SPE1, eval=TRUE, message=FALSE>>=
-library(devtools)
-load_all("~/software/SpatialPRo")
+library(SpatialPRo)
 data(SPE)
 SPE
 @
